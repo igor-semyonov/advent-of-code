@@ -1,5 +1,6 @@
 import re
 import time
+from multiprocessing import Pool
 from pathlib import Path
 
 number_to_int = {
@@ -39,13 +40,14 @@ number_to_int = {
 def main():
     input_file = Path("./input")
     lines = input_file.read_text().split("\n")
-#      lines = """two1nine
-#  eightwothree
-#  abcone2threexyz
-#  xtwone3four
-#  4nineeightseven2
-#  zoneight234
-#  7pqrstsixteen""".split('\n')
+    #      lines = """two1nine
+    #  eightwothree
+    #  abcone2threexyz
+    #  xtwone3four
+    #  4nineeightseven2
+    #  zoneight234
+    #  7pqrstsixteen""".split('\n')
+    # should be 281 with this input
 
     #  idx = 0
     #  line = lines[idx]
