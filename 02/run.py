@@ -15,9 +15,29 @@ color_to_vec = {
 
 
 def main():
-    lines = Path("./test-input.txt").read_text().split("\n")
+    two_star()
+
+
+def two_star():
+    lines = Path("./input.txt").read_text().split("\n")
+    answer = sum(map(line_to_power, lines))
+    print(answer)
+
+
+def line_to_power(line):
+    try:
+        (game, handfuls) = line.split(":")
+    except ValueError:
+        return 0
+
+    handfuls = handfuls.split(";")
+    return np.max(list(map(handful_to_balls, handfuls)), axis=0).prod()
+
+
+def one_star():
+    lines = Path("./input.txt").read_text().split("\n")
     answer = sum(map(line_to_game_id, lines))
-    print(answer, test_answer)
+    print(answer)
 
 
 def line_to_game_id(line):
