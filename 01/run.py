@@ -53,6 +53,7 @@ def main():
     #  line = lines[idx]
     #  print(line, line_to_value_2(line))
 
+    #  result = sum(map(line_to_value, lines))
     result = sum(map(line_to_value_2, lines))
     print(result)
 
