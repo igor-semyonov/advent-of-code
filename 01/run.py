@@ -3,6 +3,16 @@ import time
 from pathlib import Path
 
 number_to_int = {
+    "0": 0,
+    "1": 1,
+    "2": 2,
+    "3": 3,
+    "4": 4,
+    "5": 5,
+    "6": 6,
+    "7": 7,
+    "8": 8,
+    "9": 9,
     "zero": 0,
     "one": 1,
     "two": 2,
@@ -55,15 +65,8 @@ def line_to_value_2(line):
         line[::-1].casefold(),
     ).group()
 
-    try:
-        total += 10 * int(first_digit)
-    except ValueError:
-        total += 10 * number_to_int[first_digit]
-
-    try:
-        total += int(last_digit)
-    except ValueError:
-        total += number_to_int[last_digit]
+    total += 10 * number_to_int[first_digit]
+    total += number_to_int[last_digit]
 
     return total
 
