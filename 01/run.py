@@ -29,8 +29,8 @@ number_to_int = {
 def main():
     input_file = Path("./input")
     lines = input_file.read_text().split("\n")
-    if len(lines[-1]) == 0:
-        lines = lines[:-8]
+    #  if len(lines[-1]) == 0:
+    #      lines = lines[:-8]
 
     #  idx = 0
     #  line = lines[idx]
@@ -42,10 +42,13 @@ def main():
 
 def line_to_value_2(line):
     total = 0
-    first_digit = re.search(
-        r"0|1|2|3|4|5|6|7|8|9|zero|one|two|three|four|five|six|seven|eight|nine",
-        line.casefold(),
-    ).group()
+    try:
+        first_digit = re.search(
+            r"0|1|2|3|4|5|6|7|8|9|zero|one|two|three|four|five|six|seven|eight|nine",
+            line.casefold(),
+        ).group()
+    except AttributeError:
+        return 0
 
     last_digit = re.search(
         r"0|1|2|3|4|5|6|7|8|9|eroz|eno|owt|eerht|ruof|evif|xis|neves|thgie|enin",
