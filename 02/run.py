@@ -20,8 +20,17 @@ def main():
 
 def two_star():
     lines = Path("./input.txt").read_text().split("\n")
+
     answer = sum(map(line_to_power, lines))
     print(answer)
+
+    #  total = 0
+    #  for line in lines:
+    #      total += line_to_power(line)
+    #  print(total)
+
+    #  print(sum([line_to_power(line) for line in lines]))
+
 
 
 def line_to_power(line):
