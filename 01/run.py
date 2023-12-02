@@ -39,8 +39,13 @@ number_to_int = {
 def main():
     input_file = Path("./input")
     lines = input_file.read_text().split("\n")
-    #  if len(lines[-1]) == 0:
-    #      lines = lines[:-8]
+#      lines = """two1nine
+#  eightwothree
+#  abcone2threexyz
+#  xtwone3four
+#  4nineeightseven2
+#  zoneight234
+#  7pqrstsixteen""".split('\n')
 
     #  idx = 0
     #  line = lines[idx]
