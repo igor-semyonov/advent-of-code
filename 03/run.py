@@ -10,7 +10,7 @@ test_answer = 4361
 
 
 def main():
-    one_star()
+    two_star()
 
 
 def two_star():
@@ -38,9 +38,14 @@ def find_gears(line_spec: tuple):
         end_idx = potential_gear.end()
 
         if start_idx > 0:
-            match = re.search(r"^[\d]", line[:start_idx:-1])
+            match = re.search(r"^[\d]+", line[start_idx - 1::-1])
             if match is not None:
-                pass
+                ratios.append(int(match.group()[::-1]))
+        if end_idx < line_len - 1:
+            match = re.search(r"^[\d]+", line[end_idx:])
+            if match is not None:
+                ratios.append(int(match.group()))
+        print(ratios)
 
 
 def one_star():
