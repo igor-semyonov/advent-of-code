@@ -2,6 +2,7 @@ import re
 import time
 from collections import ChainMap
 from pathlib import Path
+import sys
 
 import numpy as np
 import scipy
@@ -9,13 +10,14 @@ import scipy
 test_answer = 4361
 
 
-def main():
-    one_star()
+def main(test_file):
+    one_star(test_file)
 
 
 def one_star():
     global input, input_array, lines, line_len, n_lines
-    input = Path("./input.txt").read_text()
+    print("Test file = " + test_file)
+    input = Path(test_file).read_text()
     if input[-1] == "\n":
         input = input[:-1]
     lines = input.split("\n")
@@ -97,6 +99,11 @@ def line_to_part_ids(line_spec: tuple):
 
 if __name__ == "__main__":
     start_time = time.perf_counter()
-    main()
+    if len(sys.argv) <= 1:
+        print("No test file provided, using default: test-input.txt")
+        test_file = "./test-input.txt"
+    else:
+        test_file = sys.argv[1]
+    main(test_file)
     end_time = time.perf_counter()
     print(f"It took {end_time - start_time} seconds")
