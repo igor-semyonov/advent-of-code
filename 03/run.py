@@ -1,10 +1,10 @@
 import re
-import scipy
 import time
 from collections import ChainMap
 from pathlib import Path
 
 import numpy as np
+import scipy
 
 test_answer = 4361
 
@@ -53,7 +53,7 @@ def one_star():
     answer = sum(part_ids.keys())
     for line_idx, line in enumerate(lines):
         if len(line) != line_len:
-            print(f'line {line_idx} not of same length as line 0')
+            print(f"line {line_idx} not of same length as line 0")
     print(answer)
 
 
@@ -85,22 +85,24 @@ def line_to_part_ids(line_spec: tuple):
 
         match_array = np.zeros_like(input_array, dtype=int)
         match_array[line_idx, start_idx:end_idx] = 1
-        convolution_kernel = np.ones((3,3), dtype=int)
+        convolution_kernel = np.ones((3, 3), dtype=int)
         neighborhood = scipy.signal.convolve2d(
-            match_array,
-            convolution_kernel,
-            mode="same"
+            match_array, convolution_kernel, mode="same"
         )
         neighborhood = (neighborhood > 0) & ~match_array.astype(bool)
-        symbol_str = ''.join(input_array[neighborhood])
+        symbol_str = "".join(input_array[neighborhood])
 
         symbol_str_re = re.search(r"[^.\d]", symbol_str)
-        #  print(part_id, symbol_str)
-        #  print(
-        #      *lines[max(line_idx - 1, 0) : min(line_idx + 2, n_lines)],
-        #      sep="\n",
-        #  )
-        #  print(symbol_str_re)
+        print(f'\npart location: line_idx: {line_idx}\tstart idx: {start_idx}\tend_idx: {end_idx}')
+        print("neiborhood bool array: \n", neighborhood)
+        print("array of neighborhood characters: ", input_array[neighborhood])
+        print('part id: ', part_id, '\nsymbol string: ', symbol_str)
+        print(
+            'original input near this part:',
+            *lines[max(line_idx - 1, 0) : min(line_idx + 2, n_lines)],
+            sep="\n",
+        )
+        print('symbol string regex match object: ', symbol_str_re)
         if symbol_str_re is None:
             continue
 
