@@ -13,33 +13,9 @@ def main():
     one_star()
 
 
-def two_star():
-    lines = Path("./input.txt").read_text().split("\n")
-
-    answer = sum(map(line_to_power, lines))
-    print(answer)
-
-    #  total = 0
-    #  for line in lines:
-    #      total += line_to_power(line)
-    #  print(total)
-
-    #  print(sum([line_to_power(line) for line in lines]))
-
-
-def line_to_power(line):
-    try:
-        (game, handfuls) = line.split(":")
-    except ValueError:
-        return 0
-
-    handfuls = handfuls.split(";")
-    return np.max(list(map(handful_to_balls, handfuls)), axis=0).prod()
-
-
 def one_star():
     global input, input_array, lines, line_len, n_lines
-    input = Path("./test-input.txt").read_text()
+    input = Path("./input.txt").read_text()
     if input[-1] == "\n":
         input = input[:-1]
     lines = input.split("\n")
@@ -49,15 +25,18 @@ def one_star():
 
     line_idx = 0
     line = lines[line_idx]
-    part_ids = dict(ChainMap(*map(line_to_part_ids, enumerate(lines))))
-    answer = sum(part_ids.keys())
-    for line_idx, line in enumerate(lines):
-        if len(line) != line_len:
-            print(f"line {line_idx} not of same length as line 0")
-    print(answer)
+    #  part_ids = dict(ChainMap(*map(line_to_part_ids, enumerate(lines))))
+    #  answer = sum(part_ids.keys())
+    #  for line_idx, line in enumerate(lines):
+    #      if len(line) != line_len:
+    #          print(f"line {line_idx} not of same length as line 0")
+    #  print(answer)
+    total = sum(map(line_to_part_ids, enumerate(lines)))
+    print(total)
 
 
 def line_to_part_ids(line_spec: tuple):
+    total = 0
     line_idx, line = line_spec
     matches = re.finditer(r"[\d]+", line)
     part_ids = {}
@@ -111,6 +90,8 @@ def line_to_part_ids(line_spec: tuple):
             "end_idx": end_idx,
             "line_idx": line_idx,
         }
+        total += part_id
+    return total
     return part_ids
 
 
