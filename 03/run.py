@@ -1,4 +1,5 @@
 import re
+import scipy
 import time
 from collections import ChainMap
 from pathlib import Path
@@ -38,7 +39,7 @@ def line_to_power(line):
 
 def one_star():
     global input, input_array, lines, line_len, n_lines
-    input = Path("./input.txt").read_text()
+    input = Path("./test-input.txt").read_text()
     if input[-1] == "\n":
         input = input[:-1]
     lines = input.split("\n")
@@ -50,6 +51,9 @@ def one_star():
     line = lines[line_idx]
     part_ids = dict(ChainMap(*map(line_to_part_ids, enumerate(lines))))
     answer = sum(part_ids.keys())
+    for line_idx, line in enumerate(lines):
+        if len(line) != line_len:
+            print(f'line {line_idx} not of same length as line 0')
     print(answer)
 
 
@@ -62,29 +66,41 @@ def line_to_part_ids(line_spec: tuple):
         start_idx = match.start()
         end_idx = match.end()
         symbol_str = ""
-        if line_idx > 0:
-            symbol_str += lines[line_idx - 1][start_idx:end_idx]
-            if start_idx > 0:
-                symbol_str += lines[line_idx - 1][start_idx - 1]
-            if end_idx < line_len - 1:
-                symbol_str += lines[line_idx - 1][end_idx]
-        if line_idx < n_lines - 1:
-            symbol_str += lines[line_idx + 1][start_idx:end_idx]
-            if start_idx > 0:
-                symbol_str += lines[line_idx + 1][start_idx - 1]
-            if end_idx < line_len - 1:
-                symbol_str += lines[line_idx + 1][end_idx]
-        if start_idx > 0:
-            symbol_str += lines[line_idx][start_idx - 1]
-        if end_idx < line_len - 1:
-            symbol_str += lines[line_idx][end_idx]
-        symbol_str_re = re.search(r"[^.]", symbol_str)
-        print(part_id, symbol_str)
-        print(
-            *lines[max(line_idx - 1, 0) : min(line_idx + 2, n_lines)],
-            sep="\n",
+        #  if line_idx > 0:
+        #      symbol_str += lines[line_idx - 1][start_idx:end_idx]
+        #      if start_idx > 0:
+        #          symbol_str += lines[line_idx - 1][start_idx - 1]
+        #      if end_idx < line_len - 1:
+        #          symbol_str += lines[line_idx - 1][end_idx]
+        #  if line_idx < n_lines - 1:
+        #      symbol_str += lines[line_idx + 1][start_idx:end_idx]
+        #      if start_idx > 0:
+        #          symbol_str += lines[line_idx + 1][start_idx - 1]
+        #      if end_idx < line_len - 1:
+        #          symbol_str += lines[line_idx + 1][end_idx]
+        #  if start_idx > 0:
+        #      symbol_str += lines[line_idx][start_idx - 1]
+        #  if end_idx < line_len - 1:
+        #      symbol_str += lines[line_idx][end_idx]
+
+        match_array = np.zeros_like(input_array, dtype=int)
+        match_array[line_idx, start_idx:end_idx] = 1
+        convolution_kernel = np.ones((3,3), dtype=int)
+        neighborhood = scipy.signal.convolve2d(
+            match_array,
+            convolution_kernel,
+            mode="same"
         )
-        print(symbol_str_re)
+        neighborhood = (neighborhood > 0) & ~match_array.astype(bool)
+        symbol_str = ''.join(input_array[neighborhood])
+
+        symbol_str_re = re.search(r"[^.\d]", symbol_str)
+        #  print(part_id, symbol_str)
+        #  print(
+        #      *lines[max(line_idx - 1, 0) : min(line_idx + 2, n_lines)],
+        #      sep="\n",
+        #  )
+        #  print(symbol_str_re)
         if symbol_str_re is None:
             continue
 
