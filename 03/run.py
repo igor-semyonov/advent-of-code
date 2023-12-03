@@ -42,7 +42,7 @@ def find_gears(line_spec: tuple):
         end_idx = potential_gear.end()
 
         if start_idx > 0:
-            match = re.search(r"^[\d]+", line[start_idx - 1::-1])
+            match = re.search(r"^[\d]+", line[start_idx - 1 :: -1])
             if match is not None:
                 ratios.append(int(match.group()[::-1]))
         if end_idx < line_len - 1:
@@ -50,14 +50,12 @@ def find_gears(line_spec: tuple):
             if match is not None:
                 ratios.append(int(match.group()))
 
+        other_lines = []
         if line_idx > 0:
-            other_line = lines[line_idx - 1]
-            for match in re.finditer(r"\d+", other_line):
-                span = list(match.span())
-                if start_idx in span or start_idx + 1 in span:
-                    ratios.append(int(match.group()))
+            other_lines.append(lines[line_idx - 1])
         if line_idx < n_lines - 1:
-            other_line = lines[line_idx + 1]
+            other_lines.append(lines[line_idx + 1])
+        for other_line in other_lines:
             for match in re.finditer(r"\d+", other_line):
                 span = list(match.span())
                 if start_idx in span or start_idx + 1 in span:
