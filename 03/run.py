@@ -13,6 +13,36 @@ def main():
     one_star()
 
 
+def two_star():
+    global input, input_array, lines, line_len, n_lines
+    input = Path("./test-input.txt").read_text()
+    if input[-1] == "\n":
+        input = input[:-1]
+    lines = input.split("\n")
+    n_lines = len(lines)
+    line_len = len(lines[0])
+    input_array = np.array([list(line) for line in lines])
+
+    line_idx = 1
+    line = lines[line_idx]
+    print(find_gears((line_idx, line)))
+
+
+def find_gears(line_spec: tuple):
+    line_idx, line = line_spec
+    potential_gears = re.finditer(r"\*", line)
+
+    for potential_gear in potential_gears:
+        ratios = []
+        start_idx = potential_gear.start()
+        end_idx = potential_gear.end()
+
+        if start_idx > 0:
+            match = re.search(r"^[\d]", line[:start_idx:-1])
+            if match is not None:
+                pass
+
+
 def one_star():
     global input, input_array, lines, line_len, n_lines
     input = Path("./input.txt").read_text()
@@ -72,16 +102,18 @@ def line_to_part_ids(line_spec: tuple):
         symbol_str = "".join(input_array[neighborhood])
 
         symbol_str_re = re.search(r"[^.\d]", symbol_str)
-        print(f'\npart location: line_idx: {line_idx}\tstart idx: {start_idx}\tend_idx: {end_idx}')
+        print(
+            f"\npart location: line_idx: {line_idx}\tstart idx: {start_idx}\tend_idx: {end_idx}"
+        )
         print("neiborhood bool array: \n", neighborhood)
         print("array of neighborhood characters: ", input_array[neighborhood])
-        print('part id: ', part_id, '\nsymbol string: ', symbol_str)
+        print("part id: ", part_id, "\nsymbol string: ", symbol_str)
         print(
-            'original input near this part:',
+            "original input near this part:",
             *lines[max(line_idx - 1, 0) : min(line_idx + 2, n_lines)],
             sep="\n",
         )
-        print('symbol string regex match object: ', symbol_str_re)
+        print("symbol string regex match object: ", symbol_str_re)
         if symbol_str_re is None:
             continue
 
