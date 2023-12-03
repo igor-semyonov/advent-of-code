@@ -15,7 +15,7 @@ def main():
 
 def two_star():
     global input, input_array, lines, line_len, n_lines
-    input = Path("./test-input.txt").read_text()
+    input = Path("./test-input2.txt").read_text()
     if input[-1] == "\n":
         input = input[:-1]
     lines = input.split("\n")
@@ -23,12 +23,16 @@ def two_star():
     line_len = len(lines[0])
     input_array = np.array([list(line) for line in lines])
 
-    line_idx = 1
-    line = lines[line_idx]
-    print(find_gears((line_idx, line)))
+    #  line_idx = 8
+    #  line = lines[line_idx]
+    #  print(find_gears((line_idx, line)))
+
+    answer = sum(map(find_gears, enumerate(lines)))
+    print(answer)
 
 
 def find_gears(line_spec: tuple):
+    total = 0
     line_idx, line = line_spec
     potential_gears = re.finditer(r"\*", line)
 
@@ -45,7 +49,23 @@ def find_gears(line_spec: tuple):
             match = re.search(r"^[\d]+", line[end_idx:])
             if match is not None:
                 ratios.append(int(match.group()))
-        print(ratios)
+
+        if line_idx > 0:
+            other_line = lines[line_idx - 1]
+            for match in re.finditer(r"\d+", other_line):
+                span = list(match.span())
+                if start_idx in span or start_idx + 1 in span:
+                    ratios.append(int(match.group()))
+        if line_idx < n_lines - 1:
+            other_line = lines[line_idx + 1]
+            for match in re.finditer(r"\d+", other_line):
+                span = list(match.span())
+                if start_idx in span or start_idx + 1 in span:
+                    ratios.append(int(match.group()))
+
+        if len(ratios) == 2:
+            total += ratios[0] * ratios[1]
+    return total
 
 
 def one_star():
