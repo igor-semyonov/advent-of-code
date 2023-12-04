@@ -29,7 +29,18 @@ def main():
 
 
 def one_star():
-    pass
+    print(sum(map(line_to_card_value, lines)))
+
+
+def line_to_card_value(line):
+    winning_numbers, my_numbers = line.split("|")
+    winning_numbers = re.sub(r" +", " ", winning_numbers)
+    my_numbers = re.sub(r" +", " ", my_numbers)
+
+    winning_numbers = {int(number) for number in winning_numbers.strip().split(" ")[2:]}
+    my_numbers = {int(number) for number in my_numbers.strip().split(" ")}
+    matching_numbers = len(winning_numbers & my_numbers)
+    return 2 ** (matching_numbers - 1) if matching_numbers > 0 else 0
 
 
 def two_star():
