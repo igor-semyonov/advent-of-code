@@ -1,4 +1,5 @@
 import re
+import sys
 import time
 from collections import ChainMap
 from pathlib import Path
@@ -10,12 +11,18 @@ test_answer = 4361
 
 
 def main():
+    global input_file
+    if len(sys.argv) < 2:
+        input_file = Path("./input.txt")
+    else:
+        input_file = Path(sys.argv[1])
+
     two_star()
 
 
 def two_star():
     global input, input_array, lines, line_len, n_lines
-    input = Path("./test-input2.txt").read_text()
+    input = input_file.read_text()
     if input[-1] == "\n":
         input = input[:-1]
     lines = input.split("\n")
@@ -57,8 +64,9 @@ def find_gears(line_spec: tuple):
             other_lines.append(lines[line_idx + 1])
         for other_line in other_lines:
             for match in re.finditer(r"\d+", other_line):
-                span = list(match.span())
-                if start_idx in span or start_idx + 1 in span:
+                span = match.span()
+                span = range(span[0] - 1, span[1] + 1)
+                if start_idx in span:
                     ratios.append(int(match.group()))
 
         if len(ratios) == 2:
@@ -68,7 +76,7 @@ def find_gears(line_spec: tuple):
 
 def one_star():
     global input, input_array, lines, line_len, n_lines
-    input = Path("./input.txt").read_text()
+    input = input_file.read_text()
     if input[-1] == "\n":
         input = input[:-1]
     lines = input.split("\n")
