@@ -25,14 +25,14 @@ def main():
     line_len = len(lines[0])
     input_array = np.array([list(line) for line in lines])
 
-    one_star()
+    two_star()
 
 
 def one_star():
     print(sum(map(line_to_card_value, lines)))
 
 
-def line_to_card_value(line):
+def line_to_matching_numbers(line):
     winning_numbers, my_numbers = line.split("|")
     winning_numbers = re.sub(r" +", " ", winning_numbers)
     my_numbers = re.sub(r" +", " ", my_numbers)
@@ -40,11 +40,40 @@ def line_to_card_value(line):
     winning_numbers = {int(number) for number in winning_numbers.strip().split(" ")[2:]}
     my_numbers = {int(number) for number in my_numbers.strip().split(" ")}
     matching_numbers = len(winning_numbers & my_numbers)
+    return matching_numbers
+
+
+def line_to_card_value(line):
+    matching_numbers = line_to_matching_numbers(line)
     return 2 ** (matching_numbers - 1) if matching_numbers > 0 else 0
 
 
 def two_star():
-    pass
+    #  sys.setrecursionlimit(10_000)
+    #  print(sum(map(line_to_copies, enumerate(lines))))
+    #  line_idx = 0
+    #  cards = line_to_copies((line_idx, lines[line_idx]))
+    #  print(cards)
+
+    cards = sum(map(line_to_copies, enumerate(lines)))
+    print(cards)
+
+
+def line_to_copies(line_spec):
+    line_idx, line = line_spec
+    matching_numbers = line_to_matching_numbers(line)
+    if matching_numbers == 0:
+        return 1
+    matching_slice = slice(line_idx + 1, line_idx + 1 + matching_numbers)
+    return 1 + sum(
+        map(
+            line_to_copies,
+            zip(
+                range(n_lines)[matching_slice],
+                lines[matching_slice],
+            ),
+        )
+    )
 
 
 if __name__ == "__main__":
