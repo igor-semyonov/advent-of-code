@@ -1,3 +1,4 @@
+import copy
 import logging
 import re
 import sys
@@ -6,7 +7,6 @@ from collections import ChainMap
 from pathlib import Path
 
 import numpy as np
-import scipy
 
 test_answer = 35
 
@@ -30,7 +30,7 @@ def main():
     line_len = len(lines[0])
     #  input_array = np.array([list(line) for line in lines])
 
-    one_star()
+    two_star()
 
 
 def one_star():
@@ -74,17 +74,105 @@ def one_star():
         destination_start, source_start, length = [
             int(x) for x in line.strip().split(" ")
         ]
-        map.append({
-            "destination_start": destination_start,
-            "source_start": source_start,
-            "length": length,
-        })
+        map.append(
+            {
+                "destination_start": destination_start,
+                "source_start": source_start,
+                "length": length,
+            }
+        )
 
     print(min(next_items))
 
 
 def two_star():
-    pass
+    seeds_line = [int(seed) for seed in lines.pop()[6:].strip().split(" ")]
+
+    seeds = []
+    for value, length in np.array(seeds_line).reshape((len(seeds_line) // 2, 2)):
+        seeds.append(
+            [
+                value,
+                length,
+            ]
+        )
+
+    previous_items = seeds
+    lines.pop()  # get rid of first blank line
+
+    i = -1
+    map = []
+    next_items = []
+    while True:
+        try:
+            line = lines.pop()
+        except IndexError:
+            line = "last time"
+        i += 1
+
+        if line == "" or line == "last time":
+            next_items += previous_items
+            previous_items = next_items
+            if line == "last time":
+                break
+            continue
+
+        if "-to-" in line:
+            map_from, map_to = line[:-5].split("-to-")
+            next_items = []
+            continue
+
+        destination_start, source_start, map_length = [
+            int(x) for x in line.strip().split(" ")
+        ]
+
+        tmp_items = previous_items
+        previous_items = []
+        while True:
+            try:
+                start, length = tmp_items.pop()
+            except IndexError:
+                break
+
+            if (start + length <= source_start) or (start >= source_start + map_length):
+                previous_items.append([start, length])
+            elif start >= source_start:
+                if start + length <= source_start + map_length:
+                    next_items.append(
+                        [destination_start + start - source_start, length]
+                    )
+                else:
+                    next_items.append(
+                        [
+                            destination_start + start - source_start,
+                            map_length - start + source_start,
+                        ]
+                    )
+                    tmp_items.append(
+                        [
+                            source_start + map_length,
+                            length - (source_start + map_length - start),
+                        ]
+                    )
+            elif start < source_start:
+                if start + length <= source_start + map_length:
+                    next_items.append(
+                        [destination_start, start - source_start + length]
+                    )
+                    tmp_items.append([start, source_start - start])
+                else:
+                    next_items.append([destination_start, map_length])
+                    tmp_items.append([start, source_start - start])
+                    tmp_items.append(
+                        [
+                            source_start + map_length,
+                            length - (source_start - start + map_length),
+                        ]
+                    )
+            else:
+                previous_items.append([start, length])
+
+    print(np.array(next_items)[:, 0].min())
 
 
 if __name__ == "__main__":
