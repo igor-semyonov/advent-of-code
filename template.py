@@ -1,3 +1,4 @@
+import logging
 import re
 import sys
 import time
@@ -5,7 +6,6 @@ from collections import ChainMap
 from pathlib import Path
 
 import numpy as np
-import scipy
 
 test_answer = 4361
 
@@ -17,13 +17,15 @@ def main():
     else:
         input_file = Path(sys.argv[1])
 
-    input = input_file.read_text()
-    if input[-1] == "\n":
-        input = input[:-1]
+    input = re.sub(
+        " +",
+        " ",
+        input_file.read_text(),
+    ).strip()
     lines = input.split("\n")
     n_lines = len(lines)
     line_len = len(lines[0])
-    input_array = np.array([list(line) for line in lines])
+    #  input_array = np.array([list(line) for line in lines])
 
     one_star()
 

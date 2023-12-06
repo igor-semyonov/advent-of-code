@@ -23,8 +23,6 @@ def main():
         " ",
         input_file.read_text(),
     ).strip()
-    #  if input[-1] == "\n":
-    #      input = input[:-1]
     lines = input.split("\n")[::-1]
     n_lines = len(lines)
     line_len = len(lines[0])
