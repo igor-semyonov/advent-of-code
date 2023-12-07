@@ -13,7 +13,7 @@ test_answer = 4361
 
 @total_ordering
 class CamelCard:
-    order = ["2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K", "A"]
+    order = ["J", "2", "3", "4", "5", "6", "7", "8", "9", "T", "Q", "K", "A"]
 
     def __init__(self, card: str):
         self.card = card
@@ -47,6 +47,7 @@ class CamelHand:
         "four-of-a-kind",
         "five-of-a-kind",
     ]
+    joker = CamelCard("J")
 
     def __init__(self, hand_string):
         self.hand, bid = hand_string.split()
@@ -55,19 +56,35 @@ class CamelHand:
         self.type = self.calculate_type()
 
     def calculate_type(self):
+        joking = self.joker in self.hand
+        j = self.joker
         counter = Counter(self.hand)
-        most_common = counter.most_common()
-        if most_common[0][1] == 5:
+        mc = counter.most_common()
+        if mc[0][1] == 5:
             return "five-of-a-kind"
-        if most_common[0][1] == 4:
+        if mc[0][1] == 4:
+            if mc[1][0] == j or mc[0][0] == j:
+                return "five-of-a-kind"
             return "four-of-a-kind"
-        if most_common[0][1] == 3:
-            if most_common[1][1] == 2:
+        if mc[0][1] == 3:
+            if mc[1][1] == 2:
+                if mc[0][0] == j or mc[1][0] == j:
+                    return "five-of-a-kind"
                 return "full-house"
+            if mc[0][0] == j or mc[1][0] == j or mc[2][0] == j:
+                return "four-of-a-kind"
             return "three-of-a-kind"
-        if most_common[0][1] == 2:
-            if most_common[1][1] == 2:
+        if mc[0][1] == 2:
+            if mc[1][1] == 2:
+                if mc[0][0] == j or mc[1][0] == j:
+                    return "four-of-a-kind"
+                if mc[2][0] == j:
+                    return "full-house"
                 return "two-pair"
+            if j in [c[0] for c in mc]:
+                return "three-of-a-kind"
+            return "one-pair"
+        if j in [c[0] for c in mc]:
             return "one-pair"
         return "high-card"
 
@@ -88,7 +105,6 @@ class CamelHand:
                 return True
             elif card > other_card:
                 return False
-
 
 
 def main():
@@ -119,7 +135,7 @@ def one_star():
     print(*sorted_hands, sep="\n")
     print([h.type for h in sorted_hands])
 
-    sorted_hand_values = [hand.bid * (idx+1) for idx, hand in enumerate(sorted_hands)]
+    sorted_hand_values = [hand.bid * (idx + 1) for idx, hand in enumerate(sorted_hands)]
     print(sorted_hand_values)
     answer = sum(sorted_hand_values)
     print(answer)
