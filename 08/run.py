@@ -1,4 +1,5 @@
 import logging
+from math import gcd
 import re
 import sys
 import time
@@ -54,9 +55,9 @@ def one_star():
 
 
 def two_star():
-    instructions = lines[0]
+    instructions_list = lines[0]
     instruction_to_number = {"L": 0, "R": 1}
-    instructions = cycle(map(lambda x: instruction_to_number[x], instructions))
+    instructions = cycle(map(lambda x: instruction_to_number[x], instructions_list))
 
     graph_lines = lines[2:]
     graph = {}
@@ -65,24 +66,31 @@ def two_star():
         node_l, node_r = node_to[1:-1].split(", ")
         graph[node] = (node_l, node_r)
 
-    current_nodes = []
-    for node in graph:
+    starting_nodes = []
+    for node in graph.keys():
         if node[-1] == "A":
-            current_nodes.append(node)
+            starting_nodes.append(node)
+    print(starting_nodes)
 
-    steps = 0
-    while True:
-        steps += 1
-        instruction = next(instructions)
-        for idx, node in enumerate(current_nodes):
-            current_nodes[idx] = graph[node][instruction]
+    all_steps = []
+    for starting_node in starting_nodes:
+        steps = 0
+        instructions = cycle(map(lambda x: instruction_to_number[x], instructions_list))
+        current_node = starting_node
+        while True:
+            steps += 1
+            instruction = next(instructions)
+            current_node = graph[current_node][instruction]
 
-        for node in current_nodes:
-            if node[-1] != "Z":
+            if current_node[-1] == "Z":
                 break
-        else:
-            break
-    print(steps)
+        all_steps.append(steps)
+
+    lcm = 1
+    for i in all_steps:
+        lcm = lcm*i//gcd(lcm, i)
+    print(lcm)
+
 
 
 if __name__ == "__main__":
