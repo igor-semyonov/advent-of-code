@@ -8,7 +8,7 @@ from pathlib import Path
 
 import numpy as np
 
-test_answer = 4361
+test_answer = 6
 
 
 def main():
@@ -28,7 +28,7 @@ def main():
     line_len = len(lines[0])
     #  input_array = np.array([list(line) for line in lines])
 
-    one_star()
+    two_star()
 
 
 def one_star():
@@ -54,7 +54,35 @@ def one_star():
 
 
 def two_star():
-    pass
+    instructions = lines[0]
+    instruction_to_number = {"L": 0, "R": 1}
+    instructions = cycle(map(lambda x: instruction_to_number[x], instructions))
+
+    graph_lines = lines[2:]
+    graph = {}
+    for node_spec in graph_lines:
+        node, node_to = node_spec.split(" = ")
+        node_l, node_r = node_to[1:-1].split(", ")
+        graph[node] = (node_l, node_r)
+
+    current_nodes = []
+    for node in graph:
+        if node[-1] == "A":
+            current_nodes.append(node)
+
+    steps = 0
+    while True:
+        steps += 1
+        instruction = next(instructions)
+        for idx, node in enumerate(current_nodes):
+            current_nodes[idx] = graph[node][instruction]
+
+        for node in current_nodes:
+            if node[-1] != "Z":
+                break
+        else:
+            break
+    print(steps)
 
 
 if __name__ == "__main__":
