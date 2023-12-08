@@ -1,10 +1,10 @@
 import logging
-from math import gcd
 import re
 import sys
 import time
 from collections import ChainMap
 from itertools import cycle
+from math import gcd
 from pathlib import Path
 
 import numpy as np
@@ -29,7 +29,24 @@ def main():
     line_len = len(lines[0])
     #  input_array = np.array([list(line) for line in lines])
 
-    two_star()
+    global instructions, graph, starting_nodes
+    instructions_list = lines[0]
+    instruction_to_number = {"L": 0, "R": 1}
+    instructions = cycle(map(lambda x: instruction_to_number[x], instructions_list))
+
+    graph_lines = lines[2:]
+    graph = {}
+    for node_spec in graph_lines:
+        node, node_to = node_spec.split(" = ")
+        node_l, node_r = node_to[1:-1].split(", ")
+        graph[node] = (node_l, node_r)
+
+    starting_nodes = []
+    for node in graph.keys():
+        if node[-1] == "A":
+            starting_nodes.append(node)
+
+    counter_example()
 
 
 def one_star():
@@ -70,7 +87,7 @@ def two_star():
     for node in graph.keys():
         if node[-1] == "A":
             starting_nodes.append(node)
-    print(starting_nodes)
+    #  print(starting_nodes)
 
     all_steps = []
     for starting_node in starting_nodes:
@@ -88,9 +105,26 @@ def two_star():
 
     lcm = 1
     for i in all_steps:
-        lcm = lcm*i//gcd(lcm, i)
-    print(lcm)
+        lcm = lcm * i // gcd(lcm, i)
+    #  print(all_steps)
+    #  print(lcm)
+    return lcm
 
+
+def counter_example():
+    two_star_solution = two_star()
+    how_far = two_star_solution * 10
+
+    print(starting_nodes)
+
+    current_nodes = starting_nodes
+    for i in range(how_far):
+        for idx, node in enumerate(current_nodes):
+            current_nodes[idx] = graph[node][next(instructions)]
+        print(current_nodes)
+        if np.all([node[-1] == 'Z' for node in current_nodes]):
+            print('Made it out of the desert')
+            break
 
 
 if __name__ == "__main__":
