@@ -8,18 +8,19 @@ from pathlib import Path
 
 import numpy as np
 
-test_answer = 4361
+test_answer = 10
 
 
 class Tile(StrEnum):
-    vertical = "|"
-    horizontal = "-"
+    north_south = "|"
+    east_west = "-"
     north_east = "L"
     north_west = "J"
     south_west = "7"
     south_east = "F"
     start = "S"
     not_pipe = "."
+    inside = "I"
 
 
 def main():
@@ -56,20 +57,20 @@ def main():
         },
         "north": {
             "idx": [-1, 0],
-            "next": list(map(Tile, ["F", "-", "7"])),
+            "next": list(map(Tile, ["F", "|", "7"])),
         },
         "south": {
             "idx": [1, 0],
-            "next": list(map(Tile, ["J", "-", "L"])),
+            "next": list(map(Tile, ["J", "|", "L"])),
         },
     }
 
-    one_star()
+    two_star()
 
 
-def show_landscape(landscape):
+def show_landscape(landscape=None):
     for row in landscape:
-        print(*[str(tile) for tile in row])
+        print(*[f"{str(tile):4}" for tile in row])
 
 
 def one_star():
@@ -148,7 +149,79 @@ def get_tile(idx):
 
 
 def two_star():
-    pass
+    show_landscape(landscape)
+    start_idx = np.where(landscape == "S")
+    start_idx = np.array([start_idx[0][0], start_idx[1][0]])
+
+    current_idx = start_idx
+    next_tiles = []
+    for direction, value in directions.items():
+        d_idx = value["idx"]
+        next_possible = value["next"]
+        next_idx = current_idx + d_idx
+        if np.all(next_idx >= [0, 0]) and np.all(next_idx < [n_lines, line_len]):
+            next_tile = get_tile(next_idx)
+            if next_tile in next_possible:
+                next_tiles.append(
+                    (
+                        direction,
+                        next_idx,
+                    )
+                )
+
+    current = next_tiles[0]
+    d_idx = next_tiles[0][1] - next_tiles[1][1]
+    possible_starting_tiles = list(
+        map(
+            lambda t: {x for x in Tile if t[0] in x.name},
+            next_tiles,
+        )
+    )
+    landscape[*start_idx] = (
+        possible_starting_tiles[0] & possible_starting_tiles[1]
+    ).pop()
+    #  show_landscape(landscape)
+
+    pipe_bool = np.zeros_like(landscape)
+    pipe_bool[*start_idx] = 1
+    pipe_bool[*current[1]] = 1
+    pipe_i = np.zeros_like(landscape)
+    pipe_i[*start_idx] = 0
+    pipe_i[*current[1]] = 1
+
+    n_steps = 1
+    while ~np.all(start_idx == current[1]):
+        pipe_bool[*current[1]] = 1
+        pipe_i[*current[1]] = n_steps
+        n_steps += 1
+        #  print(current)
+        current = move_to_next_tile(current)
+
+    show_landscape(pipe_bool)
+    #  show_landscape(pipe_i)
+
+    inside = -1
+    pipe_inside = np.zeros_like(landscape)
+    count = 0
+    for row_idx, row in enumerate(landscape):
+        last_turn_pipe = None
+        for column_idx, tile in enumerate(row):
+            idx = (row_idx, column_idx)
+            if pipe_bool[*idx]:
+                if tile == "|":
+                    inside *= -1
+                if tile == "F" or tile == "L":
+                    last_turn_pipe = tile
+                if tile == "J" or tile == "7":
+                    if (tile == "7" and last_turn_pipe == "L") or (
+                        tile == "J" and last_turn_pipe == "F"
+                    ):
+                        inside *= -1
+                    last_turn_pipe = None
+
+            elif inside == 1:
+                count += 1
+    print(count)
 
 
 if __name__ == "__main__":
