@@ -27,7 +27,9 @@ def main():
     line_len = len(lines[0])
 
     universe = np.array([list(line) for line in lines])
-    universe = expand_universe(universe)
+    #  universe = expand_universe(universe)
+    blank_rows, blank_columns = expand_universe(universe)
+    expansion_factor = 1_000_000
 
     galaxies = np.array(np.where(universe == "#")).T
     path_sum = 0
@@ -35,6 +37,12 @@ def main():
     for g0_idx, g0 in enumerate(galaxies[:-1]):
         for g1 in galaxies[g0_idx+1:]:
             path = np.sum(np.abs(g0 - g1))
+            for idx in blank_rows:
+                if idx > min(g0[0], g1[0]) and idx < max(g0[0], g1[0]):
+                    path += expansion_factor - 1
+            for idx in blank_columns:
+                if idx > min(g0[1], g1[1]) and idx < max(g0[1], g1[1]):
+                    path += expansion_factor - 1
             paths.append([g0, g1, path, g0-g1])
             path_sum += path
 
@@ -43,29 +51,15 @@ def main():
 
 
 def expand_universe(universe):
-    n_rows, n_cols = universe.shape
-    new_universe = np.copy(universe)
-    for idx, row in enumerate(universe[::-1, :]):
-        row_idx = n_rows - idx - 1
+    blank_rows = []
+    blank_columns = []
+    for idx, row in enumerate(universe):
         if "#" not in row:
-            #  print(f"found empty row at {row_idx}")
-            new_universe = np.insert(
-                new_universe,
-                row_idx,
-                ".",
-                axis=0,
-            )
-    for idx, col in enumerate(universe.T[::-1, :]):
-        col_idx = n_cols - idx - 1
+            blank_rows.append(idx)
+    for idx, col in enumerate(universe.T):
         if "#" not in col:
-            #  print(f"found empty column at {col_idx}")
-            new_universe = np.insert(
-                new_universe,
-                col_idx,
-                ".",
-                axis=1,
-            )
-    return new_universe
+            blank_columns.append(idx)
+    return blank_rows, blank_columns
 
 
 def one_star():
