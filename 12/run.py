@@ -27,7 +27,7 @@ def main():
     line_len = len(lines[0])
     #  input_array = np.array([list(line) for line in lines])
 
-    line_idx = 5
+    line_idx = 2
     line = lines[line_idx]
     #  for line in lines:
     springs, records = line.split(" ")
@@ -37,9 +37,9 @@ def main():
     bs = broken_springs(springs, records)
     print(bs)
 
-    #  bs = [*map(line_to_bs, lines)]
-    #  print(bs)
-    #  print(sum(bs))
+    bs = [*map(line_to_bs, lines)]
+    print(bs)
+    print(sum(bs))
 
 
 def line_to_bs(line):
@@ -50,8 +50,12 @@ def line_to_bs(line):
 
 def broken_springs(springs, records):
     print(springs, records)
+    if len(records) == 1:
+        if records[0] == len(springs):
+            if springs.find(".") == -1:
+                return 1
     if len(records) == 0:
-        if springs.find("?") == -1 and springs.find("#") == -1:
+        if springs.find("#") == -1:
             return 1
     if len(springs) == 0:
         if len(records) == 0:
@@ -67,10 +71,15 @@ def broken_springs(springs, records):
     re_string = f"[?#]{{{record}}}"
     regex = re.compile(re_string)
     matches = myfindall(regex, springs)
+    if record == 3:
+        print(matches)
     count = 0
     for match in matches:
         try:
-            if springs[match.start() - 1] == "#" or springs[match.end()] == "#":
+            if match.start() > 0:
+                if springs[match.start() - 1] == "#":
+                    continue
+            if springs[match.end()] == "#":
                 continue
         except IndexError:
             pass
